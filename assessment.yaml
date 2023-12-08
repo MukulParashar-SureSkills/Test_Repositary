@@ -1,7 +1,7 @@
 ---
 name: Activity Tracking
 description: Activity Tracking Test
-pass_percent: 99
+pass_percent: 100
 notify: false
 score_completion_only: false
 steps:
