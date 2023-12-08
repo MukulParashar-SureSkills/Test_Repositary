@@ -1,0 +1,171 @@
+---
+name: Activity Tracking
+description: Activity Tracking Test
+pass_percent: 99
+notify: false
+score_completion_only: false
+steps:
+- title: Track folder
+  points: 10
+  max: 57
+  interval: 10
+  multi_region: false
+  api: GCP
+  services:
+  - ComputeV1
+  - SSH
+  method_name: step_one_check
+  code: "def step_one_check(handle,points)\r\n  compute = handle[:ComputeV1]\r\n  ssh
+    = handle[:SSH]\r\n  ret_hash = { :done => false, :score => 0, :message=>\"\"}\r\n
+    \ \r\n  instance=compute.list_instances &. items || []\r\n  instance.each do |item|\r\n
+    \   item.network_interfaces.each do |network|\r\n     network.access_configs.each
+    do |ip|\r\n      netIP=ip.nat_ip\r\n      result=ssh.ssh_exec netIP, 'ls'\r\n
+    \     ret_hash[:message]=result.to_s\r\n     end\r\n    end\r\n  end\r\n  \r\n
+    \ \r\n  \r\n  return ret_hash\r\nend"
+- title: Check Instance Status
+  points: 10
+  max: 60
+  interval: 10
+  multi_region: false
+  api: GCP
+  services:
+  - ComputeV1
+  method_name: step_two_check
+  code: "def step_two_check(handles, points)
+  compute = handles[:ComputeV1]\r\n
+    \ ret_hash = { :done => false, :score => 0, :message => \"\" }\r\n  resp=compute.list_instances\r\n
+    \ if(resp.items[0].machine_type.to_s.include?(\"e2-medium\"))\r\n    ret_hash
+    = { :done => true, :score => points, :message=>\"Machine type found\"}\r\n  else\r\n
+    \   ret_hash = { :done => true, :score => points, :message=>\"Machine type not
+    found.\"}\r\n  end\r\n  return ret_hash\r\nend"
+- title: Storage Bucket
+  points: 10
+  max: 10
+  interval: 10
+  multi_region: false
+  api: GCP
+  services:
+  - StorageV1
+  method_name: step_three_check
+  code: "def step_three_check(handles, points)\r\n  storage = handles[:StorageV1]\r\n
+    \ ret_hash = { :done => false, :score => 0, :message => \"\" }\r\n  resp=storage.list_buckets\r\n
+    \ if(resp.items && resp.items[0].name.to_s == \"qwiklabs-gcp-01-33a9ad74e93a\")\r\n
+    \   bucket=resp.items[0].name.to_s\r\n    response=storage.list_objects(bucket)\r\n
+    \   if(response.items && response.items.count > 0)\r\n      ret_hash = { :done
+    => true, :score => points, :message=>\"Object found\"}\r\n    else\r\n      ret_hash
+    = { :done => false, :score => 0, :message=>\"Object not found.\"}\r\n    end\r\n
+    \ else\r\n    ret_hash = { :done => false, :score => 0, :message=>\"Bucket not
+    found.\"}\r\n  end\r\n  return ret_hash\r\nend"
+- title: Creating VPC network
+  points: 10
+  max: 30
+  interval: 5
+  multi_region: false
+  api: GCP
+  services:
+  - ComputeV1
+  method_name: step_four_check
+  code: "def step_four_check(handles, points)\r\n  compute = handles[:ComputeV1]\r\n
+    \ ret_hash = { :done => false, :score => 0, :message => \"\" }\r\n  vpc_name =
+    \"vpc-net\"\r\n  \r\n  networks = compute.list_networks &. items || []\r\n  networks.each
+    do |net|\r\n    if net.name == vpc_name\r\n      ret_hash = { :done => true, :score
+    => points, :message => \"VPC created successfully\" }\r\n    end\r\n  end\r\n
+    \ \r\n  \r\n  firewalls = compute.list_firewalls  &. items || []\r\n  ret_hash[:message]
+    = firewalls.to_json\r\n  \r\n  \r\n  \r\n  return ret_hash\r\nend"
+- title: Track VPC
+  points: 10
+  max: 9
+  interval: 10
+  multi_region: false
+  api: GCP
+  services:
+  - ComputeV1
+  method_name: step_five_check
+  code: "def step_five_check(handles, points)\r\n  compute = handles[:ComputeV1]\r\n
+    \ ret_hash = { :done => false, :score => 0, :message => \"\" }\r\n  \r\n  network_counter
+    = 0\r\n  subnet_counter = 0\r\n  my_network1 = \"vpc-1\"\r\n  my_network2 = \"vpc-2\"\r\n
+    \ network1_subnet1 = 'vpc-1-subnet-1'\r\n  network1_subnet2 = 'vpc-1-subnet-2'\r\n
+    \ network2_subnet1 = 'vpc-2-subnet-1'\r\n  network2_subnet2 = 'vpc-2-subnet-2'\r\n
+    \ test = ''\r\n  \r\n  network_list = compute.list_networks &. items || []\r\n
+    \ network_list.each do |item|\r\n    if (item.name == my_network1 && item.auto_create_subnetworks
+    == false) || (item.name == my_network2 && item.auto_create_subnetworks == false)\r\n
+    \     network_counter +=1\r\n    end\r\n  end\r\n    \r\n    if network_counter
+    == 2\r\n      ret_hash = { :done => true, :score => points, :message => \"successful\"}\r\n
+    \   end\r\n    \r\n  return ret_hash\r\nend"
+- title: Track Subnets
+  points: 10
+  max: 10
+  interval: 10
+  multi_region: false
+  api: GCP
+  services:
+  - ComputeV1
+  method_name: step_six_check
+  code: "def step_six_check(handles, points)\r\n  compute = handles[:ComputeV1]\r\n
+    \ ret_hash = { :done => false, :score => 0, :message => \"\" }\r\n  \r\n  network_counter
+    = 0\r\n  subnet_counter = 0\r\n  my_network1 = \"vpc-1\"\r\n  my_network2 = \"vpc-2\"\r\n
+    \ network1_subnet1 = 'vpc-1-subnet-1'\r\n  network1_subnet2 = 'vpc-1-subnet-2'\r\n
+    \ network2_subnet1 = 'vpc-2-subnet-1'\r\n  network2_subnet2 = 'vpc-2-subnet-2'\r\n
+    \ test = ''\r\n  \r\n  network_list = compute.list_networks &. items || []\r\n
+    \ network_list.each do |item|\r\n    if (item.name == my_network1 && item.auto_create_subnetworks
+    == false) || (item.name == my_network2 && item.auto_create_subnetworks == false)\r\n
+    \     network_counter +=1\r\n      if(item.subnetworks.to_s.include?(network1_subnet1
+    && network1_subnet2)) || (item.subnetworks.to_s.include?(network2_subnet1) &&
+    item.subnetworks.to_s.include?(network2_subnet2))\r\n        subnet_counter +=
+    1\r\n      end\r\n    end\r\n  end\r\n    \r\n    if network_counter == 2 && subnet_counter==2\r\n
+    \     ret_hash = { :done => true, :score => points, :message => \"successful\"}\r\n
+    \   end\r\n    \r\n  return ret_hash\r\nend"
+- title: Track Instances
+  points: 10
+  max: 10
+  interval: 10
+  multi_region: false
+  api: GCP
+  services:
+  - ComputeV1
+  method_name: step_seven_check
+  code: "def step_seven_check(handles, points)\r\n  compute = handles[:ComputeV1]\r\n
+    \ ret_hash = { :done => false, :score => 0, :message => \"\" }\r\n  \r\n  instance_counter=0\r\n
+    \ \r\n  instances=compute.list_instances &. items || []\r\n  instances.each do
+    |item|\r\n    item.metadata.items.each do |item_data|\r\n      if((item_data.key.to_s=='instance-template')
+    && item_data.value.to_s.include?('instance-template-example')) || ((item_data.key.to_s=='created-by')
+    && item_data.value.to_s.include?('instance-group-example'))\r\n        counter
+    +=1\r\n      end\r\n    end\r\n  end\r\n  \r\n  if counter == 6\r\n    ret_hash
+    = { :done => true, :score => points, :message => \"Success\" }\r\n  end\r\n  \r\n
+    \ return ret_hash\r\nend"
+- title: Verify Folder
+  points: 10
+  max: 10
+  interval: 10
+  multi_region: false
+  api: GCP
+  services:
+  - ComputeV1
+  - SSH
+  method_name: step_eight_check
+  code: "def step_eight_check(handles, points)\r\n  compute = handles[:ComputeV1]\r\n
+    \ ssh = handles[:SSH]\r\n  ret_hash = { :done => false, :score => 0, :message
+    => \"\" }\r\n  \r\n  instance=compute.list_instances &. items || []\r\n  instance.each
+    do |item|\r\n    item.network_interfaces.each do |network|\r\n      network.access_configs.each
+    do |ip|\r\n        netIP = ip.nat_ip\r\n        result=ssh.ssh_exec netIP, 'sudo
+    service apache2 status'\r\n        if result.include?(\"running\")\r\n          ret_hash
+    = { :done => true, :score => points, :message => \"Success\" }\r\n        end\r\n
+    \     end\r\n    end\r\n  end\r\n  return ret_hash\r\nend"
+- title: WEBSITE
+  points: 10
+  max: 10
+  interval: 10
+  multi_region: false
+  api: GCP
+  services:
+  - ComputeV1
+  - SSH
+  method_name: step_nine_check
+  code: "def step_nine_check(handles, points)\r\n  compute = handles[:ComputeV1]\r\n
+    \ ssh = handles[:SSH]\r\n  ret_hash = { :done => false, :score => 0, :message
+    => \"\" }\r\n  \r\n  instance=compute.list_instances &. items || []\r\n  instance.each
+    do |item|\r\n    item.network_interfaces.each do |network|\r\n      network.access_configs.each
+    do |ip|\r\n        netIP = ip.nat_ip\r\n        result=ssh.ssh_exec netIP, 'cat
+    /var/www/html/index.php'\r\n        if result.include?(\"AT Team\")\r\n          ret_hash
+    = { :done => true, :score => points, :message => \"Success\" }\r\n        end\r\n
+    \     end\r\n    end\r\n  end\r\n  return ret_hash\r\nend"

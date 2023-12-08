@@ -1,0 +1,218 @@
+entity_type: CourseTemplate
+schema_version: 1
+
+default_locale: en
+
+title:
+  locales:
+    en: Test Course
+
+description:
+  locales:
+    en: Description of the test course
+
+objectives:
+  locales:
+    en: |-
+      <p>Objectives of the test course</p>
+      <ul>
+        <li>Test objective 1</li>
+        <li>Test objective 2</li>
+      </ul>
+
+tags: [Test, Test course, Sample Test Course]
+level: 1
+image: url of the image for the image of the course.png
+estimated_duration_minutes: 100
+
+resources:
+- type: link
+  id: fixed-id-of-the-linkresource-id-willuseinsteps
+  title: title of the link resource
+  description: description of the link resouce
+  uri: "url of the link resouce need to add here"
+
+- type: file
+  id: fixed-id-of-thefilerecourse-id-willuseinsteps
+  title: title of the file resource
+  description: description of the file type resource
+  uri: "path of the file needs to add here"
+
+- type: video
+  id: fixed-id-of-thevideorecourse-id-willuseinsteps
+  title: title of the video resource
+  description: description of the video resource
+  Video id: will automatic generate
+  video provider: YouTube
+  duration: 10
+
+modules: 
+- id: unique-id-of-the-module1
+  title:
+    locale:
+      en: title of the first module of the test course
+  description: description of the first module of the test course
+  learning_objectives:
+    locales:
+      en: |-
+        <p>learning Objectives of the module 1 of test course</p>
+        <ul>
+          <li>first learning objective of module 1</li>
+          <li>seconde learning ofjective of module 1</li>
+        </ul>
+  steps:
+  - id: first-lesson-id
+    activity options:
+    - type: resource
+      id: fixed-id-of-the-linkresource-id-willuseinsteps
+    prompt:
+      locale:
+        en: first lession of the module 1
+
+  - id: seconed-lesson-id
+    activity options:
+    - type: resource
+      id: fixed-id-of-thefilerecourse-id-willuseinsteps
+    prompt:
+      locale:
+      en: second lession of the module 1
+
+  - id: third-lesson-id
+    activity options:
+    - type: resource
+      id: fixed-id-of-thevideorecourse-id-willuseinsteps
+    prompt:
+      locale:
+      en: third lession of the module 1
+
+- id: unique-id-of-the-module-2
+  title:
+    locale:
+      en: title of the module 2
+  description: description of the module 2
+  learning_objectives:
+    locales:
+      en: |- 
+        <p>learning Objectives of the module 2 of test course</p>
+        <ul>
+        <li>first learning objective of module 2</li>
+        <li>seconde learning ofjective of module 2</li>
+        </ul>
+  steps:
+  - id: first-lesson-of-module2
+    activity options:
+    - type: lab
+      id: unique-id-of-xyz-lab
+
+  - id: second-lesson-of-module2
+    activity options:
+    - type: lab
+      id: id-of-the-lab
+    - type: lab
+      id: id-of-the-lab2
+
+  - id: third-lesson-of-module2
+    activity_options:
+    - type: quiz
+      category: graded
+      id: compute-quiz
+
+
+
+
+
+
+
+
+
+if instances1=instance_name
+   ret_hash={:score => maximum_score, :message=>"Successful",:student_message=>"Successful"}
+ end 
+return ret_hash
+end
+
+
+
+
+ instance=compute.list_instances&.items || []
+  instance.each do|instances|
+    instances.machinetype.each_line do |line|
+machine= line
+end
+ end
+puts machine
+return ret_hash
+end
+
+ m= JSON.parse(compute.list_instances)
+c = m['machineType'].each_line do |line|
+v=line
+end
+ret_hash[:message=>'v']
+return ret_hash
+end
+
+
+
+def check(handles:, resources:, maximum_score:)
+  compute = handles['project_0.ComputeV1']
+   r=0
+  ret_hash = { :score => 0, :message => "", :student_message => "" }
+instance=compute.list_instances&.items || []
+instance.each do |line|
+   r= line.machine_type
+   end
+x= r.split('/').last
+ret_hash[:message]=x
+return ret_hash
+end
+
+
+
+def check(handles:, resources:, maximum_score:)
+  compute = handles['project_0.ComputeV1']
+  ret_hash = { :score => 0, :message => "", :student_message => "" }
+  m_type="e2-medium"
+  instance_found=false
+  instance=compute.list_instances&.items || []
+  instance.each do |line|
+    if line.machine_type.include?(m_type)
+      instance_found = true
+    end
+  end
+
+  if instance_found
+    ret_hash={:score => maximum_score, :message=>"Success",:student_message=>"Success"}
+  else
+    ret_hash={:score => 0, :message=>"Please create a instance",:student_message=>"Please create a instance"}
+  end
+  return ret_hash
+end
+
+
+def check(handles:, resources:, maximum_score:)
+  compute = handles['project_0.ComputeV1']
+  m_type="e2-medium"
+  ret_hash = { :score => 0, :message => "", :student_message => "" }
+  instance=compute.list_instances&.items || []
+instance.each do |line|
+   if line.machine_type =~ /\be2-medium\b/i
+ret_hash[:message]= "success"
+end
+end
+return ret_hash
+end
+
+def check(handles:, resources:, maximum_score:)
+  compute = handles['project_0.ComputeV1']
+   r=0
+  ret_hash = { :score => 0, :message => "", :student_message => "" 
+instance=compute.list_instances&.items || []
+instance.each do |line|
+  line.network_interfaces.each do |x|
+ r=x.subnetwork
+end
+end
+ret_hash[:message]=r
+return ret_hash
+end

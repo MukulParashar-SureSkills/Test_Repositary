@@ -1,0 +1,162 @@
+entity_type: Quiz
+schema_version: 1
+passing_percentage: 67
+default_locale: en
+default
+
+
+items:
+- id: unique id for multiple-choice
+  type: multiple-choice
+    stem: The piece of hardware that converts you computeRs digital signal to an analog signal that can travel over telephone lines is called a ?
+    options:
+      id: id for the options
+      title: 1. red wire
+      is_answer: true 
+    id: id for the options
+      title: 2. blue cord
+      is_answer: false
+    id: id for the options
+      title: 3. tower
+      is_answer: false
+    id: id for the options
+      title: 4. modem
+      is_answer: false
+    
+    stem: In a web site, the homepage refers to ?
+    options: 
+      id: id for the options
+        title:  1. the best page
+        is_answer: true 
+      id: id for the options
+        title: 2. the last page
+        is_answer: false
+      id: id for the options
+        title: 3. the first page
+        is_answer: false
+      id: id for the options
+        title: 4. the most recent page
+        is_answer: false      
+    
+- id: unique id for multiple select quiz
+    type: multiple-select
+    stem: How to ace multiple choice tests
+    options:
+      id: id for options
+        title: Come up with your own answer. ...
+        is_answer: true
+      id: id for options
+        title: another options for this question
+        is_answer: true
+      id: id for options
+        title: Come up with your own answer. ...
+        is_answer: true
+
+
+
+
+
+
+
+
+
+
+            
+
+entity_type: Lab
+schema_version: 2
+default_locale: en
+
+title: Best Lab Ever
+
+description: "No, seriously. It's the best lab ever. You're going to love it!"
+
+duration: 60
+max_duration: 90
+level: introductory
+tags: [sample, life-changing, gcp]
+
+
+# Other resources the learner may access while taking this lab
+resources: ...
+
+environment:
+  # Lab resources that are provisioned by Qwiklabs
+  #  e.g. cloud account, databases, etc.
+  resources: ...
+
+  # Properties of the lab environment that are displayed to the user
+  #  e.g. gcp project, username, password. etc.
+  student_visible_outputs: ...
+
+
+# Checkpoint evaluation and quiz data
+assessment: ...
+
+environment:
+  resources:
+    - type: gcp_project
+      id: my_primary_project
+    - type: gcp_project
+      id: secondary_project
+      variant: gcpfree
+    - type: gcp_folder
+      id: my_primary_folder
+    - type: gcp_user
+      id: primary_user
+      variant: gcp_only
+    - type: gcp_user
+      id: secondary_user
+
+- type: gcp_project
+  id: my_primary_project
+  parent: my_primary_folder
+  variant: gcpfree
+  ssh_key_user: primary_user
+  allowed_locations:
+    - us-central1
+    - europe-west1-b
+  startup_script:
+    type: deployment_manager
+    path: dm_startup_dir
+    custom_properties:
+      - key: userNameWindows
+        value: student
+      - key: userName
+        reference: primary_user.local_username
+      - key: userPassword
+        reference: primary_user.password
+      - key: sshPubKey
+        reference: primary_user.public_key
+
+
+environment:
+  resources:
+    - type: gcp_user
+      id: user_1
+      variant: default
+    - type: gcp_user
+      id: user_2
+      variant: default
+  student_visible_outputs:
+    - label: "Open Docs as First User"
+      reference: user_1.docs_url
+    - label: "Open Docs as Second User"
+      reference: user_2.docs_url
+    - label: "First User Email"
+      reference: user_1.username
+    - label: "Second User Email"
+      reference: user_2.username
+    - label: "Password (for both users)"
+      reference: user_1.password
+
+
+  - type: cloud_terminal
+    id: shell
+    permissions:
+      - project: my_primary_project
+        roles:
+          - roles/editor
+    startup_script:
+      path: startup.sh
+
